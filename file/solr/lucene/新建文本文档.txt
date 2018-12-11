@@ -1,0 +1,37 @@
+http://lucene.apache.org/core/7_2_1/index.html
+http://lucene.apache.org/core/7_2_1/core/org/apache/lucene/search/package-summary.html#package.description
+1.评分
+	Lucene评分支持许多可插入的信息检索模型， 包括：
+		向量空间模型（VSM）   https://en.wikipedia.org/wiki/Vector_space_model
+		概率模型，如Okapi BM25 and DFR   https://en.wikipedia.org/wiki/Okapi_BM25
+		语言模型 	 https://en.wikipedia.org/wiki/Language_model
+			关于VSM和IR的一些有价值的参考，请参阅 Lucene Wiki IR参考。https://wiki.apache.org/lucene-java/InformationRetrieval
+			
+2.评分-基础
+	评分非常依赖于文件索引的方式，所以了解索引是非常重要的。（ 在继续阅读本节之前，请参阅Lucene概述）请务必使用有用的内容 IndexSearcher.explain(Query, doc) 来理解如何计算某个匹配文档的分数。
+	http://lucene.apache.org/core/7_2_1/core/overview-summary.html#overview_description
+	http://lucene.apache.org/core/7_2_1/core/org/apache/lucene/search/IndexSearcher.html#explain-org.apache.lucene.search.Query-int-
+	通常，查询确定哪些文档匹配（二元决策），而相似性决定如何将匹配分配给匹配的文档。
+3.分数提升
+	Lucene允许通过包装来影响查询各个部分的分数贡献 BoostQuery。			
+			
+4.改变得分 - 相似性
+	更改Similarity是影响评分的简单方法，这是在索引时间 IndexWriterConfig.setSimilarity(Similarity)和查询时间完成的 IndexSearcher.setSimilarity(Similarity)。
+	确保在查询时使用与索引时相同的相似度（以便规范正确编码/解码）; Lucene没有努力验证这一点。
+	您可以通过配置不同的内置相似性实现，或通过调整其参数来影响评分，将其子类化以覆盖行为。一些实现还提供了一个模块化的API，
+	您可以通过插入不同的组件（例如术语频率规范化器）来扩展。最后，您可以Similarity直接扩展低级别来实现新的检索模型，
+	或使用特定于您的应用程序的外部评分因子。例如，自定义的相似性可以通过访问每个文档的值NumericDocValues并将它们集成到分数中。
+	关org.apache.lucene.search.similarities内置可用评分模型以及扩展或更改相似性的信息，请参阅软件包文档。
+	
+5.自定义查询 - 专家级别
+	自定义查询是一个专家级的任务，所以要谨慎行事，并准备好分享你的代码，如果你需要帮助。
+	有了这个警告，在Lucene中进行匹配和评分时，有可能改变的不仅仅是相似性。Lucene的搜索是一个复杂的机制，基于 三个主要类：
+		1.Query - 用户信息需要的抽象对象表示。
+		2.Weight - 用户查询的内部接口表示，以便Query对象可以被重用。这是全球性的（跨索引的所有部分），通常需要全球统计（例如docFreq在所有部门的给定期限内）。
+		3.Scorer - 一个包含通用评分功能的抽象类。提供评分和解释功能。这是按照细分来创建的。
+		4.BulkScorer - 对一系列文档进行评分的抽象类。默认的实现只是简单地遍历命中 Scorer，但是一些查询比如 BooleanQuery更有效的实现。
+	有关这些课程及其子课程的详细信息，请参见下面的小节。
+
+			
+			
+			

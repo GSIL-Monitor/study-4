@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE configuration  
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration>  
+	<!-- 属性：	配置文件 -->
+	<properties resource="db.properties"></properties>
+	
+	<!-- 环境，mybatis支持多个环境 -->
+    <!-- 对事务的管理和连接池的配置 ， 开发环境-->  
+    <environments default="development">  
+        <environment id="development"> 
+        	<!-- 事务管理器 ， 支持JDBC赫尔MANAGED（托管，tomcat不支持）--> 
+            <transactionManager type="JDBC" />  
+            <!-- 数据源， type类型有
+            	 UNPOOLED，  没有连接池， 每次数据库操作，Mabatis都会创建一个新的连接，用完后， 关闭， 适合小并发项目
+            	 POOLED， 用连接池
+            	 JNDI，	使用应用服务器配置JNDI数据源获取数据库连接-->
+            <dataSource type="POOLED">  
+                <property name="driver" value="{jdbc.driverClassName}" />  
+                <property name="url" value="{jdbc.url}" />  
+                <property name="username" value="{jdbc.username}" />  
+                <property name="password" value="{jdbc.password}" />  
+            </dataSource>  
+        </environment>  
+        <environment id="test">  
+            <transactionManager type="JDBC" />  
+            <dataSource type="POOLED">  
+                <property name="driver" value="oracle.jdbc.driver.OracleDriver" />  
+                <property name="url" value="jdbc:oracle:thin:@localhost:1521:orcl" />  
+                <property name="username" value="ibatis" />  
+                <property name="password" value="ibatis" />  
+            </dataSource>  
+        </environment>
+    </environments>  
+      
+    <!-- 类型别名, 不可取 -->
+    <!-- <typeAliases>
+    	<typeAlias alias = "Student" type="com.test.StudentVO"/>
+    </typeAliases> -->
+    <!-- 包下所有的文件都进行类型别名映射 -->
+    <typeAliases>
+    	<package name="com.test"/>
+    </typeAliases>
+    
+    <!-- mapping 文件路径配置 -->  
+    <mappers>  
+       <!-- 单个映射不推荐<mapper resource="com/yu/res/UserMapper.xml" />   -->
+       <!-- 单个映射不推荐<mapper class="com.mapper.StudentMapper"/> -->
+       <!-- 包下所有的文件都进行扫描 -->
+       <package name = "com.mapper"></package>
+    </mappers>  
+</configuration>
